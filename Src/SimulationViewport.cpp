@@ -10,7 +10,7 @@ SimulationViewport::SimulationViewport(MujocoContext& mujContext)
 
     perturb = new mjvPerturb(); 
 
-    fovY = 40.f;//*(model->cam_fovy);
+    //fovY = 40.f;//*(model->cam_fovy);
 
     timer = new QTimer(this);
     connect(timer, &QTimer::timeout, this, QOverload<>::of(&SimulationViewport::update));
@@ -31,15 +31,11 @@ void SimulationViewport::resizeGL(int w, int h) {
     viewport[2] = width;
     viewport[3] = height; 
 
-    float projF[16];
-    for (int i = 0; i < 16; ++i)
-        projF[i] = static_cast<float>(projection[i]);
-
     glMatrixMode(GL_PROJECTION);
-    computePerspective(fovY * (M_PI / 180.f), float(width) / float(height), 0.1f, 500.f, projection);
-    glLoadMatrixf(projF);
+    glLoadMatrixd(projection);
 
     glMatrixMode(GL_MODELVIEW);
+    glLoadMatrixd(cameraTransformation);
 }
 
 // Wrapper
@@ -65,11 +61,11 @@ void SimulationViewport::dragBodyWithMouse(QMouseEvent* event) {
     //std::cout << "------------------------------\n";
 
     QPointF deltaMouse = (event->position() - lastMousePosition) * devicePixelRatioF();
-    mjtNum normDX = deltaMouse.x() / viewport[2];
-    mjtNum normDY = deltaMouse.y() / viewport[3];
-    
-    mjtNum elRad = cam->elevation * mjPI / 180.0;
+    float maxViewport = std::min(viewport[2], viewport[3]);
+    mjtNum normDX = deltaMouse.x() / maxViewport;
+    mjtNum normDY = deltaMouse.y() / maxViewport;
 
+    mjtNum elRad = cam->elevation * mjPI / 180.0;
 
     float sgnDx = normDX >= 0 ? 1.0f : -1.0f;
     float sgnDy = normDY >= 0 ? 1.0f : -1.0f;
