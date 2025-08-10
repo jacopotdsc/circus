@@ -17,4 +17,5 @@ target_link_libraries(main
     Qt6::Widgets
     Qt6::OpenGLWidgets
     Eigen3::Eigen
+    GLU
 )
