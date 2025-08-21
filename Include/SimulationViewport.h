@@ -27,8 +27,12 @@ enum DragAndDropPlane
     yzPlane
 };
 
+using Vector2f = Eigen::Vector2f;
 using Vector3f = Eigen::Vector3f;
+using Vector3d = Eigen::Vector3d;
+using Vector4d = Eigen::Vector4d;
 using Matrix3f = Eigen::Matrix3f;
+using Matrix4d = Eigen::Matrix4d;
 
 namespace spqr {
 class SimulationViewport : public QOpenGLWindow {
@@ -51,7 +55,16 @@ protected:
     void computePerspective(double fovY, float aspect, float near, float far, double matrix[]);
     void resize(double fovY, unsigned int width, unsigned int height);
     Vector3f projectClick(int x, int y) const;
+    Vector2f trigonometricDelta(QMouseEvent* event, QPointF deltaMouse);
+    Vector2f unprojectDelta(QMouseEvent* event);
+    Vector3f projectClickOnPlane(int x, int y, const Vector3f& planePoint, const Vector3f& planeNormal) const;
+    QPointF projectWorldToScreen(const Vector3f& worldPos) const;
+    QPointF worldToScreenTopView(const Vector3f& p) const;
+    QPointF convertMetersToPixel(const Vector3f& p) const;
+    //QPointF projectDeltaOnPlane(const Vector3f& delta3D, const Vector3f& planeNormal);
+    QPointF projectDeltaOnPlane(const Vector3f& prevPos3D, const Vector3f& currPos3D, const Vector3f& planeNormal);
     Vector3f getCameraInWorld() const;
+    Matrix3f getCameraRotation() const;
     Vector3f getBodyTranslation(int body_id) const;
     Matrix3f getBodyRotationMatrix(int body_id);
     bool intersectRayAndPlane(const Vector3f& point, const Vector3f& v,  const Vector3f& plane, const Vector3f& n, Vector3f& intersection) const;
